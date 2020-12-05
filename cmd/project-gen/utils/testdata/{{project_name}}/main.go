@@ -1,3 +1,3 @@
 package main
 
-const ABC = "{{kratos.abc}}"
+const ABC = "{{abc}}"
