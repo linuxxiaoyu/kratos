@@ -13,6 +13,11 @@ func TestParseTemplateJSON(t *testing.T) {
 }
 
 func TestGenerate(t *testing.T) {
-	err := generateFromTemplateProject("testdata", "/tmp/new_project")
+	err := GenerateFromTemplateProject("testdata", "/tmp/new_project")
+	assert.NoError(t, err)
+}
+
+func TestClone(t *testing.T) {
+	err := CloneProjectTemplate("https://github.com/go-kratos/proposal", "/tmp/pp")
 	assert.NoError(t, err)
 }

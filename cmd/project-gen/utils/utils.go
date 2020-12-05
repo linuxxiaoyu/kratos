@@ -13,7 +13,7 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
-func cloneProjectTemplate(from, to string) (err error) {
+func CloneProjectTemplate(from, to string) (err error) {
 	_, err = git.PlainClone(to, false, &git.CloneOptions{
 		URL:      from,
 		Progress: os.Stdout,
@@ -34,7 +34,7 @@ func parseTemplateJSON(path string) (rv map[string]interface{}, err error) {
 	return
 }
 
-func generateFromTemplateProject(tplPath string, destPath string) (err error) {
+func GenerateFromTemplateProject(tplPath string, destPath string) (err error) {
 	// get template vars
 	conf, err := parseTemplateJSON(path.Join(tplPath, "kratos.json"))
 	if err != nil {
@@ -74,7 +74,7 @@ func generateFromTemplateProject(tplPath string, destPath string) (err error) {
 			}
 			destDirPath := path.Join(destPath, dirName)
 			fmt.Printf("destDirPath:%v \n", destDirPath)
-			err = os.MkdirAll(destDirPath, 0755)
+			err = os.Mkdir(destDirPath, info.Mode())
 		} else {
 			fmt.Printf("file path:%v \n", p)
 			fnTpl, err := pongo2.FromString(rp)
