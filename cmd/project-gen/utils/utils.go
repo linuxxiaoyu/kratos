@@ -55,23 +55,51 @@ func generateFromTemplateProject(tplPath string, destPath string) (err error) {
 	}
 
 	tplRoot := path.Join(tplPath, tplRootName)
-	tpl, err := pongo2.FromString(tplRootName)
-	if err != nil {
-		return err
-	}
-
-	// create project root
-	projectName, err := tpl.Execute(pongo2.Context(conf))
-	projectRoot := path.Join(destPath, projectName)
-	err = os.MkdirAll(projectRoot, 0755)
-	if err != nil {
-		return err
-	}
 
 	// walk template directory and generate to project directory
-	err = filepath.Walk(tplRoot, func(path string, info os.FileInfo, err error) error {
-		fmt.Printf("path:%v name:%v\n", path, info.Name())
-		return nil
+	err = filepath.Walk(tplRoot, func(p string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			//fmt.Printf("dir path:%v name:%v\n", p, info.Name())
+			tpl, err := pongo2.FromString(p)
+			if err != nil {
+				return err
+			}
+			dirName, err := tpl.Execute(pongo2.Context(conf))
+			if err != nil {
+				return err
+			}
+			destDirPath := path.Join(destPath, dirName)
+			fmt.Printf("destDirPath:%v \n", destDirPath)
+			err = os.MkdirAll(destDirPath, 0755)
+		} else {
+			fmt.Printf("file path:%v \n", p)
+			fnTpl, err := pongo2.FromString(p)
+			if err != nil {
+				return err
+			}
+			fcTpl, err := pongo2.FromFile(p)
+			if err != nil {
+				return err
+			}
+			fn, err := fnTpl.Execute(pongo2.Context(conf))
+			if err != nil {
+				return err
+			}
+			fc, err := fcTpl.Execute(pongo2.Context(conf))
+			if err != nil {
+				return err
+			}
+			fs, err := os.Stat(p)
+			if err != nil {
+				return err
+			}
+			destFilePath := path.Join(destPath, fn)
+			fmt.Printf("write to:%v \n", destFilePath)
+			if err = ioutil.WriteFile(destFilePath, []byte(fc), fs.Mode()); err != nil {
+				return err
+			}
+		}
+		return err
 	})
 	return
 }
